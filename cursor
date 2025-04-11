@@ -1,0 +1,36 @@
+DELIMITER //
+
+CREATE PROCEDURE proc_copy()
+BEGIN
+    DECLARE r INT;
+    DECLARE n VARCHAR(100);
+    DECLARE c VARCHAR(20);
+    DECLARE vfinished INT DEFAULT 0;
+
+    -- Declare Cursor (Specify Column Names)
+    DECLARE studcursor CURSOR FOR
+        SELECT rollno1, name1, class1 FROM student1;
+
+    -- Declare Handler for End of Cursor
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+        SET vfinished = 1;
+
+    OPEN studcursor;
+
+    getdata: LOOP
+        -- Fetch First
+        FETCH studcursor INTO r, n, c;
+
+        -- Check for End of Cursor
+        IF vfinished = 1 THEN
+            LEAVE getdata;
+        END IF;
+
+        -- Insert Data into student2
+        INSERT INTO student2 (rollno2, name2, class2) VALUES (r, n, c);
+    END LOOP getdata;
+
+    CLOSE studcursor;
+END //
+
+DELIMITER ;
